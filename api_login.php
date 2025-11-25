@@ -4,7 +4,6 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 
-// Handle preflight OPTIONS request
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit(0);
 }
@@ -17,7 +16,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-// Get POST data (form data from Flutter)
 $email = trim($_POST['email'] ?? '');
 $password = $_POST['password'] ?? '';
 
@@ -33,7 +31,6 @@ try {
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($user && password_verify($password, $user['password'])) {
-        // Login successful
         echo json_encode([
             'success' => true,
             'message' => 'Login successful',
@@ -45,7 +42,6 @@ try {
             ]
         ]);
     } else {
-        // Invalid credentials
         http_response_code(401);
         echo json_encode([
             'success' => false,
@@ -59,4 +55,3 @@ try {
         'message' => 'Server error: ' . $e->getMessage()
     ]);
 }
-?>

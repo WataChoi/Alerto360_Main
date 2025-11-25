@@ -4,7 +4,6 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 
-// Handle preflight OPTIONS request
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit(0);
 }
@@ -17,11 +16,10 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-// Get POST data (form data from Flutter)
 $name = trim($_POST['name'] ?? '');
 $email = trim($_POST['email'] ?? '');
 $password = $_POST['password'] ?? '';
-$role = $_POST['role'] ?? 'user';
+$role = $_POST['role'] ?? 'citizen';
 
 if (empty($name) || empty($email) || empty($password)) {
     http_response_code(400);
@@ -29,7 +27,6 @@ if (empty($name) || empty($email) || empty($password)) {
     exit;
 }
 
-// Validate email format
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     http_response_code(400);
     echo json_encode(['success' => false, 'message' => 'Invalid email format']);
@@ -37,7 +34,6 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
 }
 
 try {
-    // Check if email already exists
     $check = $pdo->prepare("SELECT id FROM users WHERE email = ?");
     $check->execute([$email]);
     if ($check->fetch()) {
@@ -46,7 +42,6 @@ try {
         exit;
     }
 
-    // Hash password and insert user
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
     $insert = $pdo->prepare("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)");
     
@@ -68,4 +63,3 @@ try {
         'message' => 'Server error: ' . $e->getMessage()
     ]);
 }
-?>
